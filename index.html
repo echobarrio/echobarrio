@@ -120,26 +120,25 @@
             </div>
         </div>
 
-        <!-- Mobile Navigation Bar (Bottom) -->
-        <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 grid grid-cols-4 px-2 py-2">
-            <button onclick="switchTab('archivo')" id="mob-tab-archivo" class="flex flex-col items-center justify-center py-1 text-amber-400">
-                <i data-lucide="library" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium mt-1">Archivo</span>
-            </button>
-            <button onclick="switchTab('aportar')" id="mob-tab-aportar" class="flex flex-col items-center justify-center py-1 text-zinc-400">
-                <i data-lucide="mic" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium mt-1">Grabar</span>
-            </button>
-            <button onclick="switchTab('muestra')" id="mob-tab-muestra" class="flex flex-col items-center justify-center py-1 text-zinc-400">
-                <i data-lucide="sparkles" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium mt-1">Muestra</span>
-            </button>
-            <button onclick="switchTab('admin')" id="mob-tab-admin" class="flex flex-col items-center justify-center py-1 text-zinc-400 relative">
-                <i data-lucide="shield-check" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium mt-1">Admin</span>
-                <span id="mob-pending-badge" class="hidden absolute top-0 right-4 bg-amber-500 text-zinc-950 text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">0</span>
-            </button>
-        </nav>
+        <!-- Navegación Inferior Móvil (Blindada para toque) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 px-2 py-2 flex justify-around items-center shadow-2xl">
+    <button type="button" id="mob-tab-archivo" onclick="switchTab('archivo')" class="flex-1 flex flex-col items-center justify-center py-1 text-amber-400 cursor-pointer touch-manipulation select-none">
+        <i data-lucide="library" class="w-5 h-5 mb-1 pointer-events-none"></i>
+        <span class="text-[11px] font-medium pointer-events-none">Archivo</span>
+    </button>
+    <button type="button" id="mob-tab-aportar" onclick="switchTab('aportar')" class="flex-1 flex flex-col items-center justify-center py-1 text-zinc-400 cursor-pointer touch-manipulation select-none">
+        <i data-lucide="mic" class="w-5 h-5 mb-1 pointer-events-none"></i>
+        <span class="text-[11px] font-medium pointer-events-none">Aportar</span>
+    </button>
+    <button type="button" id="mob-tab-muestra" onclick="switchTab('muestra')" class="flex-1 flex flex-col items-center justify-center py-1 text-zinc-400 cursor-pointer touch-manipulation select-none">
+        <i data-lucide="qr-code" class="w-5 h-5 mb-1 pointer-events-none"></i>
+        <span class="text-[11px] font-medium pointer-events-none">Muestra</span>
+    </button>
+    <button type="button" id="mob-tab-admin" onclick="switchTab('admin')" class="flex-1 flex flex-col items-center justify-center py-1 text-zinc-400 cursor-pointer touch-manipulation select-none">
+        <i data-lucide="shield-check" class="w-5 h-5 mb-1 pointer-events-none"></i>
+        <span class="text-[11px] font-medium pointer-events-none">Admin</span>
+    </button>
+</nav>
     </header>
 
     <!-- NOTIFICATION TOAST -->
@@ -614,31 +613,32 @@
         }
 
         // TAB SWITCHING LOGIC
-        function switchTab(tabId) {
-            ['archivo', 'aportar', 'muestra', 'admin'].forEach(id => {
-                const el = document.getElementById(`view-${id}`);
-                const btn = document.getElementById(`tab-btn-${id}`);
-                const mobBtn = document.getElementById(`mob-tab-${id}`);
-                
-                if (id === tabId) {
-                    el.classList.remove('hidden');
-                    if (btn) {
-                        btn.className = "nav-tab active-tab px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-zinc-950 shadow-md";
-                    }
-                    if (mobBtn) mobBtn.className = "flex flex-col items-center justify-center py-1 text-amber-400";
-                } else {
-                    el.classList.add('hidden');
-                    if (btn) {
-                        btn.className = "nav-tab px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900";
-                    }
-                    if (mobBtn) mobBtn.className = "flex flex-col items-center justify-center py-1 text-zinc-400";
-                }
-            });
+      function switchTab(tabId) {
+    ['archivo', 'aportar', 'muestra', 'admin'].forEach(id => {
+        const el = document.getElementById(`view-${id}`);
+        const btn = document.getElementById(`tab-btn-${id}`);
+        const mobBtn = document.getElementById(`mob-tab-${id}`);
 
-            if (tabId === 'muestra') {
-                renderPads();
+        if (id === tabId) {
+            if (el) el.classList.remove('hidden');
+            if (btn) {
+                btn.className = "nav-tab active-tab px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-zinc-950 shadow-md";
+            }
+            if (mobBtn) {
+                mobBtn.className = "flex-1 flex flex-col items-center justify-center py-1 text-amber-400 cursor-pointer touch-manipulation select-none";
+            }
+        } else {
+            if (el) el.classList.add('hidden');
+            if (btn) {
+                btn.className = "nav-tab px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900";
+            }
+            if (mobBtn) {
+                mobBtn.className = "flex-1 flex flex-col items-center justify-center py-1 text-zinc-400 cursor-pointer touch-manipulation select-none";
             }
         }
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
         // FILTER LOGIC FOR ARCHIVE
         function setFilter(type) {
