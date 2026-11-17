@@ -40,11 +40,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
-        
+
         /* Estilos personalizados para pads y efectos sonoros visuales */
         .pad-btn {
             transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
         .pad-btn:active, .pad-btn.active {
@@ -88,7 +90,7 @@
                         <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                             EchoBarrio
                         </span>
-                        <span class="hidden sm:inline-block text-xs font-mono bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full ml-2 border border-zinc-700">v1.0 Prototipo</span>
+                        <span class="hidden sm:inline-block text-xs font-mono bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full ml-2 border border-zinc-700">v1.1</span>
                     </div>
                 </div>
 
@@ -119,31 +121,35 @@
                 </div>
             </div>
         </div>
-
-        <!-- Navegación Inferior Móvil (Blindada para toque) -->
-<nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 px-2 py-2 flex justify-around items-center shadow-2xl">
-    <button type="button" id="mob-tab-archivo" onclick="switchTab('archivo')" class="flex-1 flex flex-col items-center justify-center py-1 text-amber-400 cursor-pointer touch-manipulation select-none">
-        <i data-lucide="library" class="w-5 h-5 mb-1 pointer-events-none"></i>
-        <span class="text-[11px] font-medium pointer-events-none">Archivo</span>
-    </button>
-    <button type="button" id="mob-tab-aportar" onclick="switchTab('aportar')" class="flex-1 flex flex-col items-center justify-center py-1 text-zinc-400 cursor-pointer touch-manipulation select-none">
-        <i data-lucide="mic" class="w-5 h-5 mb-1 pointer-events-none"></i>
-        <span class="text-[11px] font-medium pointer-events-none">Aportar</span>
-    </button>
-    <button type="button" id="mob-tab-muestra" onclick="switchTab('muestra')" class="flex-1 flex flex-col items-center justify-center py-1 text-zinc-400 cursor-pointer touch-manipulation select-none">
-        <i data-lucide="qr-code" class="w-5 h-5 mb-1 pointer-events-none"></i>
-        <span class="text-[11px] font-medium pointer-events-none">Muestra</span>
-    </button>
-    <button type="button" id="mob-tab-admin" onclick="switchTab('admin')" class="flex-1 flex flex-col items-center justify-center py-1 text-zinc-400 cursor-pointer touch-manipulation select-none">
-        <i data-lucide="shield-check" class="w-5 h-5 mb-1 pointer-events-none"></i>
-        <span class="text-[11px] font-medium pointer-events-none">Admin</span>
-    </button>
-</nav>
     </header>
 
+    <!-- Mobile Navigation Bar (Bottom).
+         IMPORTANTE: vive FUERA del <header>. El header tiene backdrop-blur, y un ancestro con
+         backdrop-filter convierte a sus hijos "fixed" en relativos a él (no a la pantalla),
+         lo que rompía la barra inferior en móvil. -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 grid grid-cols-4 px-2 py-2">
+        <button onclick="switchTab('archivo')" id="mob-tab-archivo" class="flex flex-col items-center justify-center py-1 text-amber-400">
+            <i data-lucide="library" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium mt-1">Archivo</span>
+        </button>
+        <button onclick="switchTab('aportar')" id="mob-tab-aportar" class="flex flex-col items-center justify-center py-1 text-zinc-400">
+            <i data-lucide="mic" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium mt-1">Grabar</span>
+        </button>
+        <button onclick="switchTab('muestra')" id="mob-tab-muestra" class="flex flex-col items-center justify-center py-1 text-zinc-400">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium mt-1">Muestra</span>
+        </button>
+        <button onclick="switchTab('admin')" id="mob-tab-admin" class="flex flex-col items-center justify-center py-1 text-zinc-400 relative">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium mt-1">Admin</span>
+            <span id="mob-pending-badge" class="hidden absolute top-0 right-4 bg-amber-500 text-zinc-950 text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+        </button>
+    </nav>
+
     <!-- NOTIFICATION TOAST -->
-    <div id="toast" class="fixed top-20 right-4 z-50 transform translate-x-full transition-transform duration-300 max-w-sm bg-zinc-900 border border-zinc-700 text-zinc-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-        <i id="toast-icon" data-lucide="info" class="w-5 h-5 text-amber-400 flex-shrink-0"></i>
+    <div id="toast" class="fixed top-20 right-4 z-[60] transform translate-x-full transition-transform duration-300 max-w-sm bg-zinc-900 border border-zinc-700 text-zinc-100 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <span id="toast-icon-wrap" class="flex-shrink-0"></span>
         <p id="toast-message" class="text-sm">Notificación</p>
     </div>
 
@@ -152,7 +158,6 @@
 
         <!-- TAB 1: ARCHIVO / BANCO DE SONIDOS -->
         <section id="view-archivo" class="space-y-6">
-            <!-- Header section banner -->
             <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800 p-6 md:p-8">
                 <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="relative z-10 max-w-3xl">
@@ -192,9 +197,7 @@
             </div>
 
             <!-- Sound Grid List -->
-            <div id="sound-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Visual Cards rendered by JS -->
-            </div>
+            <div id="sound-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
         <!-- TAB 2: APORTAR / GRABAR -->
@@ -222,14 +225,13 @@
                 <!-- RECORDING INTERFACE -->
                 <div id="section-mic-record" class="bg-zinc-950 rounded-xl border border-zinc-800 p-6 text-center space-y-4 mb-6">
                     <div id="mic-status-text" class="text-sm text-zinc-400 font-mono">Presiona el botón para iniciar la grabación</div>
-                    
+
                     <div class="flex items-center justify-center gap-4">
-                        <button id="btn-record" onclick="toggleRecording()" class="w-20 h-20 rounded-full bg-gradient-to-tr from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 flex items-center justify-center shadow-lg shadow-rose-600/30 transition-transform active:scale-95 group">
+                        <button type="button" id="btn-record" onclick="toggleRecording()" class="w-20 h-20 rounded-full bg-gradient-to-tr from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 flex items-center justify-center shadow-lg shadow-rose-600/30 transition-transform active:scale-95 group">
                             <div id="record-icon-inner" class="w-8 h-8 rounded-full bg-white group-hover:scale-110 transition-transform"></div>
                         </button>
                     </div>
 
-                    <!-- Timer & Level Wave -->
                     <div class="flex flex-col items-center justify-center">
                         <div id="record-timer" class="text-3xl font-mono font-extrabold text-white">00:00 / 00:15</div>
                         <div class="w-full bg-zinc-900 h-2 rounded-full mt-3 overflow-hidden border border-zinc-800 max-w-xs">
@@ -237,7 +239,6 @@
                         </div>
                     </div>
 
-                    <!-- Recorded Preview Audio Element -->
                     <div id="audio-preview-container" class="hidden pt-4 border-t border-zinc-800 text-left">
                         <span class="text-xs font-bold text-emerald-400 flex items-center gap-1 mb-2">
                             <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Grabación finalizada con éxito
@@ -253,8 +254,8 @@
                         <div class="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center text-amber-400 border border-zinc-800">
                             <i data-lucide="upload-cloud" class="w-6 h-6"></i>
                         </div>
-                        <span class="text-sm font-semibold text-zinc-200">Haz clic para seleccionar o arrastra un audio</span>
-                        <span class="text-xs text-zinc-500">Formatos MP3, WAV, OGG, M4A (Máx. 5 MB)</span>
+                        <span class="text-sm font-semibold text-zinc-200">Toca para seleccionar un audio</span>
+                        <span class="text-xs text-zinc-500">Formatos MP3, WAV, OGG, M4A (Máx. 5 MB y 15 s)</span>
                     </label>
                     <div id="file-name-display" class="hidden mt-3 text-xs font-mono text-emerald-400 bg-emerald-950/40 py-1.5 px-3 rounded-lg border border-emerald-800/50"></div>
                 </div>
@@ -264,7 +265,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-zinc-300 mb-1">Título del Sonido *</label>
-                            <input type="text" id="input-title" required placeholder="Ej: Vendedor de Pescado del Puerto" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500">
+                            <input type="text" id="input-title" required maxlength="80" placeholder="Ej: Vendedor de Pescado del Puerto" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-zinc-300 mb-1">Tipo de Sonido *</label>
@@ -280,15 +281,15 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-zinc-300 mb-1">Lugar / Barrio / Sector *</label>
-                            <input type="text" id="input-location" required placeholder="Ej: Muelle Principal, Barrio El Centro" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500">
+                            <input type="text" id="input-location" required maxlength="80" placeholder="Ej: Muelle Principal, Barrio El Centro" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-zinc-300 mb-1">Nombre del Aportante / Seudónimo *</label>
-                            <input type="text" id="input-author" required placeholder="Ej: María Gómez" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500">
+                            <input type="text" id="input-author" required maxlength="60" placeholder="Ej: María Gómez" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500">
                         </div>
                     </div>
 
-                    <!-- LEGAL AUTHORIZATION CHECKBOXES (REQ #5) -->
+                    <!-- LEGAL AUTHORIZATION CHECKBOXES -->
                     <div class="pt-4 border-t border-zinc-800 space-y-3">
                         <h3 class="text-xs font-extrabold uppercase tracking-wider text-amber-400">
                             Autorización Legal y Licencia Abierta
@@ -297,7 +298,7 @@
                         <label class="flex items-start gap-3 cursor-pointer group">
                             <input type="checkbox" id="check-cc" required class="mt-0.5 rounded bg-zinc-950 border-zinc-700 text-amber-500 focus:ring-amber-500">
                             <span class="text-xs text-zinc-400 group-hover:text-zinc-200">
-                                Autorizo la publicación bajo **Licencia Creative Commons (CC BY 4.0)**, permitiendo su libre uso, remezcla y descarga citando la autoría comunitaria.
+                                Autorizo la publicación bajo <strong class="text-zinc-200">Licencia Creative Commons (CC BY 4.0)</strong>, permitiendo su libre uso, remezcla y descarga citando la autoría comunitaria.
                             </span>
                         </label>
 
@@ -323,7 +324,7 @@
                         </label>
                     </div>
 
-                    <button type="submit" class="w-full mt-6 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-extrabold py-3 px-6 rounded-xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
+                    <button type="submit" id="btn-submit-aporte" class="w-full mt-6 bg-amber-500 hover:bg-amber-400 disabled:opacity-60 disabled:cursor-wait text-zinc-950 font-extrabold py-3 px-6 rounded-xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
                         <i data-lucide="send" class="w-4 h-4"></i> Enviar Aporte para Revisión
                     </button>
                 </form>
@@ -332,7 +333,6 @@
 
         <!-- TAB 3: MUESTRA EN VIVO / PANTALLA LIMPIA (PROYECCIÓN) -->
         <section id="view-muestra" class="hidden space-y-8">
-            <!-- Proyección Clean Header -->
             <div class="bg-gradient-to-r from-zinc-900 via-emerald-950/40 to-zinc-900 border border-emerald-500/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
                     <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-block mb-2">
@@ -353,27 +353,32 @@
                 </div>
             </div>
 
-            <!-- SAMPLER PADS GRID (REQ #11 & #14) -->
+            <!-- SAMPLER PADS GRID -->
             <div class="space-y-4">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <h3 class="text-xl font-bold text-white flex items-center gap-2">
                         <i data-lucide="grid" class="w-5 h-5 text-amber-400"></i> Pads de Ejecución en Vivo (4x3 Grid)
                     </h3>
-                    <span class="text-xs font-mono text-zinc-400">Haz clic o toca para activar las muestras</span>
+                    <div class="flex items-center gap-2">
+                        <span class="hidden lg:inline text-xs font-mono text-zinc-400">Toca los pads o usa el teclado: 1-4 · Q-R · A-F</span>
+                        <button type="button" onclick="renderPads(true)" class="px-3 py-1.5 bg-zinc-900 border border-zinc-700 hover:border-amber-500/60 text-zinc-300 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Recargar pads
+                        </button>
+                        <button type="button" onclick="stopAllPads()" class="px-3 py-1.5 bg-rose-950/60 border border-rose-800 text-rose-400 hover:bg-rose-900 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                            <i data-lucide="square" class="w-3.5 h-3.5"></i> Detener todo
+                        </button>
+                    </div>
                 </div>
 
-                <div id="sampler-pads" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Dynamic Pads Loaded via JS -->
-                </div>
+                <div id="sampler-pads" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
             </div>
 
-            <!-- BEATS & DEMO TRACKS SECTION (REQ #8) -->
+            <!-- BEATS & DEMO TRACKS SECTION -->
             <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
                 <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     <i data-lucide="disc" class="w-5 h-5 text-cyan-400"></i> Piezas de Muestra & Beats Producidos con el Banco
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Beat 1 -->
                     <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col justify-between">
                         <div>
                             <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest">Beat 01 - Cumbia Electro</span>
@@ -384,7 +389,6 @@
                             <i data-lucide="play" class="w-4 h-4"></i> Reproducir Beat 1
                         </button>
                     </div>
-                    <!-- Beat 2 -->
                     <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col justify-between">
                         <div>
                             <span class="text-[10px] font-mono text-emerald-400 uppercase tracking-widest">Beat 02 - Ambient Dub</span>
@@ -395,7 +399,6 @@
                             <i data-lucide="play" class="w-4 h-4"></i> Reproducir Beat 2
                         </button>
                     </div>
-                    <!-- Beat 3 -->
                     <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 flex flex-col justify-between">
                         <div>
                             <span class="text-[10px] font-mono text-amber-400 uppercase tracking-widest">Beat 03 - Urban Hip-Hop</span>
@@ -407,10 +410,11 @@
                         </button>
                     </div>
                 </div>
+                <p class="text-[11px] text-zinc-500 mt-3">Los beats de esta versión se sintetizan en el navegador como piezas de demostración; sustitúyelos por tus mezclas reales cuando las tengas.</p>
             </div>
         </section>
 
-        <!-- TAB 4: MODERACIÓN / ADMIN PENDIENTES (REQ #6) -->
+        <!-- TAB 4: MODERACIÓN / ADMIN -->
         <section id="view-admin" class="hidden space-y-6">
             <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-zinc-800">
@@ -427,7 +431,6 @@
                     </button>
                 </div>
 
-                <!-- Admin Tabs Sub-navigation -->
                 <div class="flex items-center gap-2 mb-6 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 max-w-md">
                     <button onclick="switchAdminTab('pending')" id="admin-subtab-pending" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all bg-amber-500 text-zinc-950 shadow-sm flex items-center justify-center gap-2">
                         <i data-lucide="clock" class="w-3.5 h-3.5"></i> Pendientes de Revisión
@@ -437,31 +440,25 @@
                     </button>
                 </div>
 
-                <!-- Pending Items Section -->
                 <div id="admin-section-pending" class="space-y-3">
-                    <div id="pending-list" class="space-y-3">
-                        <!-- Pending items populated by JS -->
-                    </div>
+                    <div id="pending-list" class="space-y-3"></div>
                 </div>
 
-                <!-- Published Items Management Section -->
                 <div id="admin-section-published" class="hidden space-y-3">
                     <div class="mb-4 relative">
                         <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500"></i>
                         <input type="text" id="admin-published-search" oninput="renderPublishedAdminList()" placeholder="Buscar en publicados para eliminar..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-xs text-zinc-100 focus:outline-none focus:border-amber-500">
                     </div>
-                    <div id="published-admin-list" class="space-y-3">
-                        <!-- Published items populated by JS -->
-                    </div>
+                    <div id="published-admin-list" class="space-y-3"></div>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- CONFIG / SUPABASE MODAL (REQ #15 & CONFIG) -->
-    <div id="config-modal" class="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+    <!-- CONFIG / SUPABASE MODAL -->
+    <div id="config-modal" class="fixed inset-0 z-[70] bg-zinc-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeConfigModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
@@ -488,11 +485,12 @@
 
             <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 text-xs text-zinc-400 space-y-1">
                 <p class="font-bold text-zinc-200">📌 Estado Actual: <span id="modal-status-text" class="text-amber-400">Modo Demo (LocalStorage)</span></p>
-                <p>Si no ingresas llaves, el prototipo funciona perfectamente usando la memoria de este navegador.</p>
+                <p>Si no ingresas llaves, el prototipo funciona usando la memoria de este navegador (los aportes solo se ven en este dispositivo).</p>
+                <p>Con Supabase, ejecuta antes el archivo <span class="font-mono text-zinc-300">supabase_setup.sql</span> en el SQL Editor. Todos los teléfonos verán los mismos aportes.</p>
             </div>
 
             <div class="flex gap-3 pt-2">
-                <button onclick="saveSupabaseConfig()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-2.5 rounded-xl text-sm transition-all">
+                <button id="btn-save-config" onclick="saveSupabaseConfig()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-2.5 rounded-xl text-sm transition-all">
                     Guardar Configuración
                 </button>
                 <button onclick="closeConfigModal()" class="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-xl text-sm transition-all">
@@ -505,7 +503,49 @@
     <!-- JAVASCRIPT APPLICATION LOGIC -->
     <script>
         // ==========================================
-        // INITIAL MOCK DATA (REQ #7: 40+ Sound Mocks)
+        // UTILIDADES
+        // ==========================================
+        const $ = (id) => document.getElementById(id);
+
+        function icons() {
+            // Si el CDN de Lucide no cargó (sin internet), la app sigue funcionando sin iconos.
+            try { if (window.lucide) window.lucide.createIcons(); } catch (e) { /* noop */ }
+        }
+
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+        function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+        function lsRemove(k) { try { localStorage.removeItem(k); } catch (e) { /* noop */ } }
+
+        function hashCode(str) {
+            let h = 0;
+            for (let i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) | 0; }
+            return Math.abs(h);
+        }
+
+        function fmtDur(sec) {
+            if (!sec || !isFinite(sec)) return '—';
+            const s = Math.round(sec);
+            return `0:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function extFromMime(mime) {
+            const m = (mime || '').toLowerCase();
+            if (m.includes('webm')) return 'webm';
+            if (m.includes('mp4') || m.includes('m4a') || m.includes('aac')) return 'm4a';
+            if (m.includes('ogg')) return 'ogg';
+            if (m.includes('wav')) return 'wav';
+            if (m.includes('mpeg') || m.includes('mp3')) return 'mp3';
+            return 'webm';
+        }
+
+        // ==========================================
+        // DATOS INICIALES (40 sonidos de demostración)
         // ==========================================
         const MOCK_CATEGORIES = {
             ambiente: { label: 'Ambiente / Río', icon: '🌊', color: 'emerald' },
@@ -514,11 +554,13 @@
             coro: { label: 'Coro & Ritmo', icon: '🎵', color: 'cyan' }
         };
 
-        // Audio Context para respaldo sintético de los 40 samples precargados
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let currentAudioElement = null; // Elemento de audio global activo
+        const PAD_STYLES = {
+            ambiente: 'from-emerald-500/30 to-emerald-900/40 border-emerald-500/40 text-emerald-200',
+            pregon: 'from-amber-500/30 to-amber-900/40 border-amber-500/40 text-amber-200',
+            voz: 'from-purple-500/30 to-purple-900/40 border-purple-500/40 text-purple-200',
+            coro: 'from-cyan-500/30 to-cyan-900/40 border-cyan-500/40 text-cyan-200'
+        };
 
-        // 40 Initial pre-loaded sounds (Río, Puerto, Plaza, Mercado, Vendedores)
         const INITIAL_SOUNDS = [
             { id: 's1', title: 'Remo en el Río Magdalena', type: 'ambiente', location: 'Río Magdalena', author: 'Don Efraín', approved: true, duration: '0:12', date: '2026-11-01', freq: 220 },
             { id: 's2', title: 'Pregón: Pescado Fresco del Muelle', type: 'pregon', location: 'Puerto Principal', author: 'Rosa María', approved: true, duration: '0:08', date: '2026-11-02', freq: 350 },
@@ -562,85 +604,246 @@
             { id: 's40', title: 'Oleaje Suave al Atardecer', type: 'ambiente', location: 'Mirador del Río', author: 'Equipo EchoBarrio', approved: true, duration: '0:15', date: '2026-11-08', freq: 110 }
         ];
 
-        // Global State variables
+        // ==========================================
+        // AUDIO (AudioContext perezoso: en móvil debe crearse/reanudarse tras un gesto del usuario)
+        // ==========================================
+        let audioCtx = null;
+        function getCtx() {
+            if (!audioCtx) {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AC();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        // ==========================================
+        // ESTADO GLOBAL
+        // ==========================================
         let soundsState = [];
         let activeFilter = 'all';
         let activeAdminSubtab = 'pending';
         let currentPlayingId = null;
+        let currentAudioElement = null;
+        let currentSynth = null;
+        let synthTimer = null;
         let isRecording = false;
         let recordTimerInterval = null;
         let recordSeconds = 0;
         let recordedBlob = null;
         let recordedDataUrl = null;
+        let selectedFile = null;
         let selectedFileDataUrl = null;
+        let selectedFileDuration = null;
         let activeAporteMethod = 'mic';
         let mediaRecorder = null;
         let audioChunks = [];
+        let padSounds = [];
+        let lastCloudSignature = '';
+        let toastTimer = null;
 
-        // INITIALIZATION ON PAGE LOAD
-        window.onload = function() {
-            lucide.createIcons();
+        // ==========================================
+        // SUPABASE (REST + Storage, sin librerías)
+        // ==========================================
+        function sbConfig() {
+            const url = (lsGet('echobarrio_sb_url') || '').trim().replace(/\/+$/, '');
+            const key = (lsGet('echobarrio_sb_key') || '').trim();
+            return { url, key };
+        }
+        function cloudEnabled() {
+            const c = sbConfig();
+            return !!(c.url && c.key);
+        }
+
+        async function sbRequest(method, path, body, extraHeaders, cfg) {
+            const c = cfg || sbConfig();
+            const headers = Object.assign({
+                apikey: c.key,
+                Authorization: 'Bearer ' + c.key
+            }, extraHeaders || {});
+            if (body !== undefined && !(body instanceof Blob)) {
+                headers['Content-Type'] = 'application/json';
+                body = JSON.stringify(body);
+            }
+            const res = await fetch(c.url + '/rest/v1/' + path, { method, headers, body });
+            if (!res.ok) {
+                const txt = await res.text().catch(() => '');
+                throw new Error('Supabase ' + res.status + ': ' + txt.slice(0, 200));
+            }
+            const ct = res.headers.get('content-type') || '';
+            return ct.includes('json') ? res.json() : null;
+        }
+
+        async function sbUploadAudio(blob, fileName) {
+            const c = sbConfig();
+            const contentType = (blob.type || 'audio/webm').split(';')[0];
+            const res = await fetch(c.url + '/storage/v1/object/audios/' + fileName, {
+                method: 'POST',
+                headers: { apikey: c.key, Authorization: 'Bearer ' + c.key, 'Content-Type': contentType },
+                body: blob
+            });
+            if (!res.ok) {
+                const txt = await res.text().catch(() => '');
+                throw new Error('Storage ' + res.status + ': ' + txt.slice(0, 200));
+            }
+            return c.url + '/storage/v1/object/public/audios/' + fileName;
+        }
+
+        async function sbDeleteAudioFile(audioUrl) {
+            try {
+                const c = sbConfig();
+                const marker = '/storage/v1/object/public/audios/';
+                const idx = (audioUrl || '').indexOf(marker);
+                if (idx === -1) return;
+                const name = audioUrl.slice(idx + marker.length);
+                await fetch(c.url + '/storage/v1/object/audios/' + name, {
+                    method: 'DELETE',
+                    headers: { apikey: c.key, Authorization: 'Bearer ' + c.key }
+                });
+            } catch (e) { /* mejor esfuerzo */ }
+        }
+
+        function rowToSound(r) {
+            if (!r || !/^[A-Za-z0-9_-]+$/.test(String(r.id || ''))) return null;
+            const url = r.audio_url && /^https?:\/\//i.test(r.audio_url) ? r.audio_url : null;
+            return {
+                id: r.id,
+                title: r.title || 'Sin título',
+                type: MOCK_CATEGORIES[r.type] ? r.type : 'ambiente',
+                location: r.location || '',
+                author: r.author || '',
+                approved: r.approved === true,
+                duration: r.duration || '—',
+                audioUrl: url,
+                date: r.date || '',
+                fromCloud: true
+            };
+        }
+
+        function getHiddenMocks() {
+            try { return JSON.parse(lsGet('echobarrio_hidden_mocks') || '[]'); } catch (e) { return []; }
+        }
+
+        async function refreshFromCloud(silent, includePads) {
+            if (!cloudEnabled()) return;
+            try {
+                const rows = await sbRequest('GET', 'sounds?select=*&order=created_at.desc');
+                const cloud = (rows || []).map(rowToSound).filter(Boolean);
+                const hidden = getHiddenMocks();
+                const mocks = INITIAL_SOUNDS.filter(s => !hidden.includes(s.id));
+                const signature = cloud.map(s => s.id + ':' + s.approved).join('|') + '#' + mocks.length;
+                if (signature === lastCloudSignature && !includePads) return;
+                lastCloudSignature = signature;
+                soundsState = [...cloud, ...mocks];
+                renderAll(!!includePads);
+            } catch (e) {
+                console.error(e);
+                if (!silent) showToast('No se pudo sincronizar con la nube.', 'cloud-off');
+            }
+        }
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+        window.addEventListener('load', function () {
+            icons();
             loadInitialSounds();
-            renderSounds();
-            renderPads();
-            renderPendingList();
-            renderPublishedAdminList();
+            updateModeIndicator();
+            renderAll(true);
             generateQRCode();
-        };
+            updatePendingBadges();
 
-        // Load or initialize sounds from LocalStorage
+            if (location.hash === '#aportar') switchTab('aportar');
+
+            if (cloudEnabled()) {
+                refreshFromCloud(true, true);
+                // Sincronización periódica (los pads NO se reordenan solos durante la muestra)
+                setInterval(() => {
+                    if (!document.hidden && !isRecording) refreshFromCloud(true, false);
+                }, 20000);
+            }
+
+            // Disparo de pads con el teclado
+            document.addEventListener('keydown', (e) => {
+                if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+                if ($('view-muestra').classList.contains('hidden')) return;
+                const tag = (e.target.tagName || '').toLowerCase();
+                if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+                const idx = PAD_KEYS.indexOf(e.key.toLowerCase());
+                if (idx > -1) triggerPad(idx);
+            });
+        });
+
         function loadInitialSounds() {
-            const stored = localStorage.getItem('echobarrio_sounds');
+            if (cloudEnabled()) {
+                const hidden = getHiddenMocks();
+                soundsState = INITIAL_SOUNDS.filter(s => !hidden.includes(s.id));
+                return;
+            }
+            const stored = lsGet('echobarrio_sounds');
             if (stored) {
                 try {
-                    soundsState = JSON.parse(stored);
-                } catch(e) {
-                    soundsState = INITIAL_SOUNDS;
+                    const parsed = JSON.parse(stored);
+                    soundsState = Array.isArray(parsed) ? parsed : INITIAL_SOUNDS.slice();
+                } catch (e) {
+                    soundsState = INITIAL_SOUNDS.slice();
                 }
             } else {
-                soundsState = INITIAL_SOUNDS;
+                soundsState = INITIAL_SOUNDS.slice();
                 saveSoundsToStorage();
             }
         }
 
         function saveSoundsToStorage() {
-            try {
-                localStorage.setItem('echobarrio_sounds', JSON.stringify(soundsState));
-            } catch(e) {
-                showToast('Advertencia: Almacenamiento local lleno. Elimina aportes antiguos.', 'alert-triangle');
+            let ok = true;
+            if (!cloudEnabled()) {
+                ok = lsSet('echobarrio_sounds', JSON.stringify(soundsState));
+                if (!ok) showToast('Almacenamiento local lleno. Elimina aportes antiguos o conecta Supabase.', 'alert-triangle');
             }
+            updatePendingBadges();
+            return ok;
+        }
+
+        function renderAll(includePads) {
+            renderSounds();
+            renderPendingList();
+            renderPublishedAdminList();
+            if (includePads) renderPads();
             updatePendingBadges();
         }
 
-        // TAB SWITCHING LOGIC
-      function switchTab(tabId) {
-    ['archivo', 'aportar', 'muestra', 'admin'].forEach(id => {
-        const el = document.getElementById(`view-${id}`);
-        const btn = document.getElementById(`tab-btn-${id}`);
-        const mobBtn = document.getElementById(`mob-tab-${id}`);
-
-        if (id === tabId) {
-            if (el) el.classList.remove('hidden');
-            if (btn) {
-                btn.className = "nav-tab active-tab px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-zinc-950 shadow-md";
-            }
-            if (mobBtn) {
-                mobBtn.className = "flex-1 flex flex-col items-center justify-center py-1 text-amber-400 cursor-pointer touch-manipulation select-none";
-            }
-        } else {
-            if (el) el.classList.add('hidden');
-            if (btn) {
-                btn.className = "nav-tab px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900";
-            }
-            if (mobBtn) {
-                mobBtn.className = "flex-1 flex flex-col items-center justify-center py-1 text-zinc-400 cursor-pointer touch-manipulation select-none";
-            }
+        function updateModeIndicator() {
+            const cloud = cloudEnabled();
+            $('storage-mode-indicator').innerText = cloud ? 'Modo Nube (Supabase)' : 'Modo Demo Local';
+            $('modal-status-text').innerText = cloud ? 'Conectado a Supabase' : 'Modo Demo (LocalStorage)';
         }
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
 
-        // FILTER LOGIC FOR ARCHIVE
+        // ==========================================
+        // NAVEGACIÓN
+        // ==========================================
+        function switchTab(tabId) {
+            ['archivo', 'aportar', 'muestra', 'admin'].forEach(id => {
+                const el = $(`view-${id}`);
+                const btn = $(`tab-btn-${id}`);
+                const mobBtn = $(`mob-tab-${id}`);
+
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    if (btn) btn.className = "nav-tab active-tab px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all bg-amber-500 text-zinc-950 shadow-md" + (id === 'admin' ? ' relative' : '');
+                    if (mobBtn) mobBtn.className = "flex flex-col items-center justify-center py-1 text-amber-400" + (id === 'admin' ? ' relative' : '');
+                } else {
+                    el.classList.add('hidden');
+                    if (btn) btn.className = "nav-tab px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900" + (id === 'admin' ? ' relative' : '');
+                    if (mobBtn) mobBtn.className = "flex flex-col items-center justify-center py-1 text-zinc-400" + (id === 'admin' ? ' relative' : '');
+                }
+            });
+
+            if (tabId !== 'muestra') stopBeat();
+            if (tabId === 'muestra') renderPads();
+            if (tabId === 'admin') { renderPendingList(); renderPublishedAdminList(); }
+            window.scrollTo(0, 0);
+        }
+
         function setFilter(type) {
             activeFilter = type;
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -653,22 +856,24 @@
             renderSounds();
         }
 
-        // RENDER AUDIO CARDS IN ARCHIVE (REQ #1, #2, #3, #4)
+        // ==========================================
+        // ARCHIVO: RENDER DE TARJETAS
+        // ==========================================
         function renderSounds() {
-            const container = document.getElementById('sound-grid');
-            const searchVal = document.getElementById('search-input').value.toLowerCase();
-            
+            const container = $('sound-grid');
+            const searchVal = $('search-input').value.toLowerCase();
+
             const approvedSounds = soundsState.filter(s => s.approved !== false);
-            
+
             const filtered = approvedSounds.filter(s => {
                 const matchesFilter = activeFilter === 'all' || s.type === activeFilter;
-                const matchesSearch = s.title.toLowerCase().includes(searchVal) || 
-                                      s.location.toLowerCase().includes(searchVal) || 
-                                      s.author.toLowerCase().includes(searchVal);
+                const matchesSearch = (s.title || '').toLowerCase().includes(searchVal) ||
+                                      (s.location || '').toLowerCase().includes(searchVal) ||
+                                      (s.author || '').toLowerCase().includes(searchVal);
                 return matchesFilter && matchesSearch;
             });
 
-            document.getElementById('sound-count').innerText = filtered.length;
+            $('sound-count').innerText = filtered.length;
 
             if (filtered.length === 0) {
                 container.innerHTML = `
@@ -677,7 +882,7 @@
                         <p class="text-sm font-medium">No se encontraron sonidos con ese criterio.</p>
                     </div>
                 `;
-                lucide.createIcons();
+                icons();
                 return;
             }
 
@@ -685,54 +890,54 @@
                 const cat = MOCK_CATEGORIES[sound.type] || MOCK_CATEGORIES.ambiente;
                 const isPlaying = currentPlayingId === sound.id;
                 const isRealAudio = !!sound.audioUrl;
+                const seed = sound.freq || (hashCode(sound.id) % 900 + 100);
 
                 return `
                     <div class="bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 rounded-2xl p-4 transition-all hover:shadow-xl flex flex-col justify-between group">
                         <div>
                             <div class="flex items-center justify-between gap-2 mb-3">
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-zinc-950 border border-zinc-800 text-zinc-300 flex items-center gap-1">
-                                    <span>${cat.icon}</span> ${cat.label}
+                                    <span>${cat.icon}</span> ${esc(cat.label)}
                                 </span>
                                 <div class="flex items-center gap-1.5">
                                     ${isRealAudio ? '<span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800/60">🎤 Grabación Real</span>' : ''}
                                     <span class="text-[10px] font-mono text-zinc-500 flex items-center gap-1">
-                                        <i data-lucide="clock" class="w-3 h-3"></i> ${sound.duration}
+                                        <i data-lucide="clock" class="w-3 h-3"></i> ${esc(sound.duration)}
                                     </span>
                                 </div>
                             </div>
 
                             <h3 class="font-bold text-zinc-100 text-base leading-snug group-hover:text-amber-400 transition-colors">
-                                ${sound.title}
+                                ${esc(sound.title)}
                             </h3>
 
                             <div class="mt-2 space-y-1 text-xs text-zinc-400">
                                 <div class="flex items-center gap-1.5">
                                     <i data-lucide="map-pin" class="w-3.5 h-3.5 text-zinc-500"></i>
-                                    <span>${sound.location}</span>
+                                    <span>${esc(sound.location)}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <i data-lucide="user" class="w-3.5 h-3.5 text-zinc-500"></i>
-                                    <span>Aporte de: <strong class="text-zinc-300">${sound.author}</strong></span>
+                                    <span>Aporte de: <strong class="text-zinc-300">${esc(sound.author)}</strong></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Waveform Visualization & Player -->
                         <div class="mt-4 pt-3 border-t border-zinc-800/80 space-y-3">
                             <div class="flex items-center gap-1 h-6 px-1">
                                 ${Array.from({length: 24}).map((_, i) => {
-                                    const h = (Math.sin(i * 0.7 + (sound.freq || 300)) * 40 + 50);
+                                    const h = (Math.sin(i * 0.7 + seed) * 40 + 50);
                                     return `<div class="waveform-bar flex-1 rounded-full ${isPlaying ? 'bg-amber-400 animate-pulse' : 'bg-zinc-800'}" style="height: ${isPlaying ? Math.max(20, (h + Math.random()*30)%100) : h}%"></div>`;
                                 }).join('')}
                             </div>
 
                             <div class="flex items-center justify-between gap-2">
-                                <button onclick="playSound('${sound.id}')" class="flex-1 ${isPlaying ? 'bg-amber-500 text-zinc-950' : 'bg-zinc-950 hover:bg-zinc-800 text-zinc-200'} border border-zinc-800 font-bold py-2 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
+                                <button onclick="playSound('${esc(sound.id)}')" class="flex-1 ${isPlaying ? 'bg-amber-500 text-zinc-950' : 'bg-zinc-950 hover:bg-zinc-800 text-zinc-200'} border border-zinc-800 font-bold py-2 px-3 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
                                     <i data-lucide="${isPlaying ? 'square' : 'play'}" class="w-3.5 h-3.5"></i>
                                     <span>${isPlaying ? 'Detener' : 'Escuchar Audio'}</span>
                                 </button>
-                                
-                                <button onclick="downloadSoundSample('${sound.id}')" title="Descargar Sample Abierto" class="p-2 bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-amber-400 border border-zinc-800 rounded-xl transition-all">
+
+                                <button onclick="downloadSoundSample('${esc(sound.id)}')" title="Descargar Sample Abierto" class="p-2 bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-amber-400 border border-zinc-800 rounded-xl transition-all">
                                     <i data-lucide="download" class="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -741,18 +946,52 @@
                 `;
             }).join('');
 
-            lucide.createIcons();
+            icons();
         }
 
-        // REAL AUDIO PLAYER & SYNTHETIC FALLBACK LOGIC
-        function playSound(id) {
-            // Detener cualquier audio previo
-            if (currentAudioElement) {
-                currentAudioElement.pause();
-                currentAudioElement = null;
-            }
+        // ==========================================
+        // REPRODUCCIÓN (audio real + síntesis de respaldo)
+        // ==========================================
+        function synthSample(freq, dur) {
+            const ctx = getCtx();
+            const t = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq || 300, t);
 
-            if (currentPlayingId === id) {
+            const lfo = ctx.createOscillator();
+            const lfoGain = ctx.createGain();
+            lfo.frequency.value = 5;
+            lfoGain.gain.value = 15;
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
+
+            gain.gain.setValueAtTime(0.3, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            lfo.start(t);
+            osc.start(t);
+            osc.stop(t + dur);
+            lfo.stop(t + dur);
+
+            return { stop: () => { try { osc.stop(); lfo.stop(); } catch (e) { /* ya detenido */ } } };
+        }
+
+        function stopCurrent() {
+            if (currentAudioElement) { currentAudioElement.pause(); currentAudioElement = null; }
+            if (currentSynth) { currentSynth.stop(); currentSynth = null; }
+            clearTimeout(synthTimer);
+        }
+
+        function playSound(id) {
+            const wasPlaying = currentPlayingId === id;
+            stopCurrent();
+
+            if (wasPlaying) {
                 currentPlayingId = null;
                 renderSounds();
                 return;
@@ -764,95 +1003,81 @@
             currentPlayingId = id;
             renderSounds();
 
-            // CASO 1: Audio real capturado/subido (DataURL / Blob URL)
             if (sound.audioUrl) {
                 const audio = new Audio(sound.audioUrl);
                 currentAudioElement = audio;
-                
                 audio.play().catch(err => {
                     console.error("Error reproduciendo audio real:", err);
                     showToast('No se pudo reproducir el archivo de audio.', 'alert-circle');
                     currentPlayingId = null;
                     renderSounds();
                 });
-
                 audio.onended = () => {
-                    currentPlayingId = null;
+                    if (currentPlayingId === id) currentPlayingId = null;
                     currentAudioElement = null;
                     renderSounds();
                 };
                 return;
             }
 
-            // CASO 2: Sonido sintético de demostración (Para los 40 precargados iniciales)
             try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(sound.freq || 300, audioCtx.currentTime);
-                
-                const lfo = audioCtx.createOscillator();
-                lfo.frequency.value = 5;
-                const lfoGain = audioCtx.createGain();
-                lfoGain.gain.value = 15;
-                lfo.connect(osc.frequency);
-                lfo.start();
-
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.0);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                osc.start();
-                osc.stop(audioCtx.currentTime + 3.0);
-
-                setTimeout(() => {
+                currentSynth = synthSample(sound.freq || 300, 3.0);
+                synthTimer = setTimeout(() => {
                     if (currentPlayingId === id) {
                         currentPlayingId = null;
+                        currentSynth = null;
                         renderSounds();
                     }
                 }, 3000);
-            } catch(e) {
+            } catch (e) {
                 console.log("Audio Context Error", e);
+                currentPlayingId = null;
+                renderSounds();
             }
         }
 
-        // DOWNLOAD SAMPLE FUNCTION
-        function downloadSoundSample(id) {
+        async function downloadSoundSample(id) {
             const sound = soundsState.find(s => s.id === id);
             if (!sound) return;
+            const base = 'echobarrio_' + (sound.title || 'sonido').toLowerCase().replace(/[^a-z0-9áéíóúñ]+/gi, '_').replace(/^_+|_+$/g, '');
+
+            const triggerDownload = (href, name) => {
+                const a = document.createElement('a');
+                a.href = href;
+                a.download = name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
 
             if (sound.audioUrl) {
-                // Descarga directa de archivo de audio grabado
-                const a = document.createElement('a');
-                a.href = sound.audioUrl;
-                a.download = `echobarrio_${sound.title.toLowerCase().replace(/\s+/g, '_')}.mp3`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                try {
+                    const blob = await (await fetch(sound.audioUrl)).blob();
+                    const url = URL.createObjectURL(blob);
+                    triggerDownload(url, `${base}.${extFromMime(blob.type)}`);
+                    setTimeout(() => URL.revokeObjectURL(url), 5000);
+                } catch (e) {
+                    window.open(sound.audioUrl, '_blank');
+                }
             } else {
-                // Descarga de certificado/metadatos de sample libre precargado
                 const blob = new Blob([`EchoBarrio Open Sample: ${sound.title}\nLugar: ${sound.location}\nAutor: ${sound.author}\nLicencia: CC BY 4.0`], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `echobarrio_${sound.title.toLowerCase().replace(/\s+/g, '_')}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                triggerDownload(url, `${base}.txt`);
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
             }
             showToast(`Descarga iniciada: ${sound.title}`, 'download');
         }
 
-        // APORTE METHOD SWITCHER (MIC VS FILE)
+        // ==========================================
+        // APORTAR: MÉTODO, GRABACIÓN Y ARCHIVO
+        // ==========================================
         function setAporteMethod(method) {
+            if (isRecording) stopRecording();
             activeAporteMethod = method;
-            const micSec = document.getElementById('section-mic-record');
-            const fileSec = document.getElementById('section-file-upload');
-            const btnMic = document.getElementById('btn-method-mic');
-            const btnFile = document.getElementById('btn-method-file');
+            const micSec = $('section-mic-record');
+            const fileSec = $('section-file-upload');
+            const btnMic = $('btn-method-mic');
+            const btnFile = $('btn-method-file');
 
             if (method === 'mic') {
                 micSec.classList.remove('hidden');
@@ -867,59 +1092,67 @@
             }
         }
 
-        // MIC RECORDING LOGIC (REQ #1: Max 15s & Real Audio DataURL Capture)
+        function pickRecorderMime() {
+            const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
+            if (window.MediaRecorder && MediaRecorder.isTypeSupported) {
+                for (const t of candidates) { if (MediaRecorder.isTypeSupported(t)) return t; }
+            }
+            return '';
+        }
+
         async function toggleRecording() {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
+            if (isRecording) { stopRecording(); return; }
 
-                    mediaRecorder.ondataavailable = event => {
-                        if (event.data.size > 0) {
-                            audioChunks.push(event.data);
-                        }
-                    };
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+                showToast('Tu navegador no permite grabar aquí. Abre la página con HTTPS o sube un archivo.', 'alert-triangle');
+                return;
+            }
 
-                    mediaRecorder.onstop = () => {
-                        recordedBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                        const audioUrl = URL.createObjectURL(recordedBlob);
-                        const player = document.getElementById('recorded-audio-player');
-                        player.src = audioUrl;
-                        document.getElementById('audio-preview-container').classList.remove('hidden');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mime = pickRecorderMime();
+                mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+                audioChunks = [];
+                recordedBlob = null;
+                recordedDataUrl = null;
+                $('audio-preview-container').classList.add('hidden');
 
-                        // Convertir a DataURL Base64 para persistir en localStorage
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            recordedDataUrl = reader.result;
-                        };
-                        reader.readAsDataURL(recordedBlob);
-                    };
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data && event.data.size > 0) audioChunks.push(event.data);
+                };
 
-                    mediaRecorder.start(100);
-                    isRecording = true;
-                    recordSeconds = 0;
+                mediaRecorder.onstop = () => {
+                    const type = mediaRecorder.mimeType || mime || 'audio/webm';
+                    recordedBlob = new Blob(audioChunks, { type });
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    const player = $('recorded-audio-player');
+                    player.src = audioUrl;
+                    $('audio-preview-container').classList.remove('hidden');
 
-                    document.getElementById('mic-status-text').innerText = "🔴 Grabando sonido del barrio... (Máximo 15s)";
-                    document.getElementById('record-icon-inner').className = "w-6 h-6 rounded-sm bg-rose-600 animate-pulse";
+                    const reader = new FileReader();
+                    reader.onloadend = () => { recordedDataUrl = reader.result; };
+                    reader.readAsDataURL(recordedBlob);
+                };
 
-                    recordTimerInterval = setInterval(() => {
-                        recordSeconds++;
-                        const progressPct = (recordSeconds / 15) * 100;
-                        document.getElementById('record-progress').style.width = `${progressPct}%`;
-                        document.getElementById('record-timer').innerText = `00:${recordSeconds < 10 ? '0' : ''}${recordSeconds} / 00:15`;
+                mediaRecorder.start(100);
+                isRecording = true;
+                recordSeconds = 0;
 
-                        if (recordSeconds >= 15) {
-                            stopRecording();
-                        }
-                    }, 1000);
+                $('mic-status-text').innerText = "🔴 Grabando sonido del barrio... (Máximo 15s)";
+                $('record-icon-inner').className = "w-6 h-6 rounded-sm bg-rose-600 animate-pulse";
+                $('record-progress').style.width = '0%';
+                $('record-timer').innerText = '00:00 / 00:15';
 
-                } catch (err) {
-                    console.error("Error al solicitar micrófono:", err);
-                    showToast('No se pudo acceder al micrófono. Verifica los permisos.', 'alert-triangle');
-                }
+                recordTimerInterval = setInterval(() => {
+                    recordSeconds++;
+                    $('record-progress').style.width = `${(recordSeconds / 15) * 100}%`;
+                    $('record-timer').innerText = `00:${recordSeconds < 10 ? '0' : ''}${recordSeconds} / 00:15`;
+                    if (recordSeconds >= 15) stopRecording();
+                }, 1000);
+
+            } catch (err) {
+                console.error("Error al solicitar micrófono:", err);
+                showToast('No se pudo acceder al micrófono. Verifica los permisos.', 'alert-triangle');
             }
         }
 
@@ -933,78 +1166,172 @@
                 mediaRecorder.stream.getTracks().forEach(track => track.stop());
             }
 
-            document.getElementById('mic-status-text').innerText = "Grabación completada. Escucha el resultado abajo.";
-            document.getElementById('record-icon-inner').className = "w-8 h-8 rounded-full bg-white group-hover:scale-110 transition-transform";
+            $('mic-status-text').innerText = "Grabación completada. Escucha el resultado abajo.";
+            $('record-icon-inner').className = "w-8 h-8 rounded-full bg-white group-hover:scale-110 transition-transform";
         }
 
-        // FILE SELECTION HANDLER (READ FILE AS BASE64 DATAURL)
         function handleFileSelect(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Check file size (5MB max)
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('El archivo supera el límite de 5MB.', 'alert-circle');
+            const reject = (msg) => {
+                showToast(msg, 'alert-circle');
                 e.target.value = '';
+                selectedFile = null;
+                selectedFileDataUrl = null;
+                selectedFileDuration = null;
+                $('file-name-display').classList.add('hidden');
+            };
+
+            if (file.type && !file.type.startsWith('audio/')) { reject('El archivo debe ser de audio.'); return; }
+            if (file.size > 5 * 1024 * 1024) { reject('El archivo supera el límite de 5MB.'); return; }
+
+            const accept = (durationSec) => {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    selectedFile = file;
+                    selectedFileDataUrl = event.target.result;
+                    selectedFileDuration = durationSec;
+                    const display = $('file-name-display');
+                    display.innerText = `📄 Seleccionado: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB${durationSec ? ', ' + Math.round(durationSec) + ' s' : ''})`;
+                    display.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            };
+
+            // Validar la duración máxima de 15 s (cuando el navegador la puede leer)
+            const probeUrl = URL.createObjectURL(file);
+            const probe = new Audio();
+            probe.preload = 'metadata';
+            probe.onloadedmetadata = () => {
+                URL.revokeObjectURL(probeUrl);
+                if (isFinite(probe.duration) && probe.duration > 15.5) {
+                    reject('El audio dura más de 15 segundos.');
+                } else {
+                    accept(isFinite(probe.duration) ? probe.duration : null);
+                }
+            };
+            probe.onerror = () => { URL.revokeObjectURL(probeUrl); accept(null); };
+            probe.src = probeUrl;
+        }
+
+        function resetAporteForm() {
+            $('form-aporte').reset();
+            recordedBlob = null;
+            recordedDataUrl = null;
+            selectedFile = null;
+            selectedFileDataUrl = null;
+            selectedFileDuration = null;
+            recordSeconds = 0;
+            $('audio-file-input').value = '';
+            $('recorded-audio-player').removeAttribute('src');
+            $('audio-preview-container').classList.add('hidden');
+            $('file-name-display').classList.add('hidden');
+            $('record-timer').innerText = '00:00 / 00:15';
+            $('record-progress').style.width = '0%';
+            $('mic-status-text').innerText = 'Presiona el botón para iniciar la grabación';
+        }
+
+        async function submitSoundForm(e) {
+            e.preventDefault();
+
+            if (isRecording) {
+                showToast('Detén la grabación antes de enviar.', 'mic');
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                selectedFileDataUrl = event.target.result;
-                const display = document.getElementById('file-name-display');
-                display.innerText = `📄 Seleccionado: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                display.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
+            const title = $('input-title').value.trim();
+            const type = $('input-type').value;
+            const location = $('input-location').value.trim();
+            const author = $('input-author').value.trim();
 
-        // SUBMIT NEW SOUND APORTE FORM
-        function submitSoundForm(e) {
-            e.preventDefault();
-
-            const title = document.getElementById('input-title').value;
-            const type = document.getElementById('input-type').value;
-            const location = document.getElementById('input-location').value;
-            const author = document.getElementById('input-author').value;
-
-            let finalAudioUrl = null;
+            let blob = null;
+            let dataUrl = null;
+            let durationStr;
 
             if (activeAporteMethod === 'mic') {
-                if (!recordedDataUrl) {
+                if (!recordedBlob) {
                     showToast('Por favor realiza una grabación antes de enviar.', 'mic');
                     return;
                 }
-                finalAudioUrl = recordedDataUrl;
+                blob = recordedBlob;
+                dataUrl = recordedDataUrl;
+                durationStr = fmtDur(recordSeconds > 0 ? recordSeconds : null);
             } else {
-                if (!selectedFileDataUrl) {
+                if (!selectedFile) {
                     showToast('Por favor selecciona un archivo de audio válido.', 'upload');
                     return;
                 }
-                finalAudioUrl = selectedFileDataUrl;
+                blob = selectedFile;
+                dataUrl = selectedFileDataUrl;
+                durationStr = fmtDur(selectedFileDuration);
             }
 
-            const secCalculated = activeAporteMethod === 'mic' && recordSeconds > 0 ? recordSeconds : 10;
-            const secStr = secCalculated < 10 ? `0${secCalculated}` : `${secCalculated}`;
+            const cloud = cloudEnabled();
+            if (!cloud && !dataUrl) {
+                showToast('Procesando el audio, intenta de nuevo en un segundo.', 'loader');
+                return;
+            }
 
-            const newSound = {
-                id: 'sound_' + Date.now(),
-                title: title,
-                type: type,
-                location: location,
-                author: author,
-                approved: false, // Requisito #6: Pasa a moderación
-                duration: `0:${secStr}`,
-                audioUrl: finalAudioUrl,
-                date: new Date().toISOString().split('T')[0]
-            };
-        // ADMIN SUBTAB SWITCHER
+            const id = 'sound_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            const date = new Date().toISOString().split('T')[0];
+            const btn = $('btn-submit-aporte');
+            const btnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Enviando...';
+
+            try {
+                if (cloud) {
+                    const ext = extFromMime(blob.type);
+                    const audioUrl = await sbUploadAudio(blob, `${id}.${ext}`);
+                    await sbRequest('POST', 'sounds', {
+                        id, title, type, location, author,
+                        approved: false,
+                        duration: durationStr,
+                        audio_url: audioUrl,
+                        date
+                    }, { Prefer: 'return=minimal' });
+                    lastCloudSignature = '';
+                    await refreshFromCloud(true, false);
+                } else {
+                    const newSound = {
+                        id, title, type, location, author,
+                        approved: false,
+                        duration: durationStr,
+                        audioUrl: dataUrl,
+                        date
+                    };
+                    soundsState.unshift(newSound);
+                    if (!saveSoundsToStorage()) {
+                        soundsState = soundsState.filter(s => s.id !== id);
+                        updatePendingBadges();
+                        return;
+                    }
+                    renderAll(false);
+                }
+
+                resetAporteForm();
+                showToast('¡Aporte enviado! Quedará visible cuando sea aprobado.', 'check-circle');
+                switchTab('archivo');
+            } catch (err) {
+                console.error(err);
+                showToast('No se pudo enviar el aporte. Revisa tu conexión e inténtalo de nuevo.', 'alert-triangle');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = btnHtml;
+                icons();
+            }
+        }
+
+        // ==========================================
+        // MODERACIÓN
+        // ==========================================
         function switchAdminTab(subtab) {
             activeAdminSubtab = subtab;
-            const pendingSec = document.getElementById('admin-section-pending');
-            const publishedSec = document.getElementById('admin-section-published');
-            const btnPending = document.getElementById('admin-subtab-pending');
-            const btnPublished = document.getElementById('admin-subtab-published');
+            const pendingSec = $('admin-section-pending');
+            const publishedSec = $('admin-section-published');
+            const btnPending = $('admin-subtab-pending');
+            const btnPublished = $('admin-subtab-published');
 
             if (subtab === 'pending') {
                 pendingSec.classList.remove('hidden');
@@ -1021,9 +1348,8 @@
             }
         }
 
-        // RENDER ADMIN / PENDING APPROVAL LIST (REQ #6)
         function renderPendingList() {
-            const container = document.getElementById('pending-list');
+            const container = $('pending-list');
             const pending = soundsState.filter(s => s.approved === false);
 
             if (pending.length === 0) {
@@ -1033,7 +1359,7 @@
                         <p class="text-sm font-medium">No hay aportes pendientes de revisión.</p>
                     </div>
                 `;
-                lucide.createIcons();
+                icons();
                 return;
             }
 
@@ -1043,21 +1369,21 @@
                 return `
                     <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">${cat.icon} ${cat.label}</span>
-                                <h4 class="font-bold text-white text-sm">${sound.title}</h4>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">${cat.icon} ${esc(cat.label)}</span>
+                                <h4 class="font-bold text-white text-sm">${esc(sound.title)}</h4>
                                 ${isReal ? '<span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-bold">Voz Real</span>' : ''}
                             </div>
-                            <p class="text-xs text-zinc-400">Lugar: ${sound.location} | Aportante: <strong class="text-zinc-300">${sound.author}</strong> | Fecha: ${sound.date}</p>
+                            <p class="text-xs text-zinc-400">Lugar: ${esc(sound.location)} | Aportante: <strong class="text-zinc-300">${esc(sound.author)}</strong> | Fecha: ${esc(sound.date)}</p>
                         </div>
                         <div class="flex items-center gap-2 w-full md:w-auto">
-                            <button onclick="playSound('${sound.id}')" class="px-3 py-1.5 bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold flex items-center gap-1">
+                            <button onclick="playSound('${esc(sound.id)}')" class="px-3 py-1.5 bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold flex items-center gap-1">
                                 <i data-lucide="play" class="w-3.5 h-3.5"></i> Escuchar Audio
                             </button>
-                            <button onclick="approveSound('${sound.id}')" class="flex-1 md:flex-none px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1">
+                            <button onclick="approveSound('${esc(sound.id)}')" class="flex-1 md:flex-none px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1">
                                 <i data-lucide="check" class="w-3.5 h-3.5"></i> Aprobar
                             </button>
-                            <button onclick="deleteSound('${sound.id}')" class="flex-1 md:flex-none px-3 py-1.5 bg-rose-950/80 border border-rose-800 text-rose-400 hover:bg-rose-900 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
+                            <button onclick="deleteSound('${esc(sound.id)}')" class="flex-1 md:flex-none px-3 py-1.5 bg-rose-950/80 border border-rose-800 text-rose-400 hover:bg-rose-900 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Descartar
                             </button>
                         </div>
@@ -1065,17 +1391,17 @@
                 `;
             }).join('');
 
-            lucide.createIcons();
+            icons();
         }
 
-        // RENDER PUBLISHED AUDIOS IN ADMIN PANEL FOR DELETION
         function renderPublishedAdminList() {
-            const container = document.getElementById('published-admin-list');
-            const searchVal = (document.getElementById('admin-published-search')?.value || '').toLowerCase();
+            const container = $('published-admin-list');
+            const searchEl = $('admin-published-search');
+            const searchVal = (searchEl ? searchEl.value : '').toLowerCase();
             const published = soundsState.filter(s => s.approved !== false && (
-                s.title.toLowerCase().includes(searchVal) ||
-                s.location.toLowerCase().includes(searchVal) ||
-                s.author.toLowerCase().includes(searchVal)
+                (s.title || '').toLowerCase().includes(searchVal) ||
+                (s.location || '').toLowerCase().includes(searchVal) ||
+                (s.author || '').toLowerCase().includes(searchVal)
             ));
 
             if (published.length === 0) {
@@ -1085,7 +1411,7 @@
                         <p class="text-sm font-medium">No hay audios publicados que coincidan con la búsqueda.</p>
                     </div>
                 `;
-                lucide.createIcons();
+                icons();
                 return;
             }
 
@@ -1095,18 +1421,18 @@
                 return `
                     <div class="bg-zinc-950 border border-zinc-800 hover:border-zinc-700 rounded-xl p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                         <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-900 text-zinc-300 border border-zinc-800">${cat.icon} ${cat.label}</span>
-                                <h4 class="font-bold text-white text-sm">${sound.title}</h4>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-900 text-zinc-300 border border-zinc-800">${cat.icon} ${esc(cat.label)}</span>
+                                <h4 class="font-bold text-white text-sm">${esc(sound.title)}</h4>
                                 ${isReal ? '<span class="text-[10px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded font-bold">Voz Real</span>' : ''}
                             </div>
-                            <p class="text-xs text-zinc-400">Lugar: ${sound.location} | Aportante: <strong class="text-zinc-300">${sound.author}</strong></p>
+                            <p class="text-xs text-zinc-400">Lugar: ${esc(sound.location)} | Aportante: <strong class="text-zinc-300">${esc(sound.author)}</strong></p>
                         </div>
                         <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-                            <button onclick="playSound('${sound.id}')" class="px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold flex items-center gap-1">
+                            <button onclick="playSound('${esc(sound.id)}')" class="px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 rounded-lg text-xs font-semibold flex items-center gap-1">
                                 <i data-lucide="play" class="w-3.5 h-3.5"></i> Escuchar
                             </button>
-                            <button onclick="deleteSound('${sound.id}')" class="px-3 py-1.5 bg-rose-950/80 border border-rose-800 text-rose-400 hover:bg-rose-900 rounded-lg text-xs font-bold flex items-center gap-1">
+                            <button onclick="deleteSound('${esc(sound.id)}')" class="px-3 py-1.5 bg-rose-950/80 border border-rose-800 text-rose-400 hover:bg-rose-900 rounded-lg text-xs font-bold flex items-center gap-1">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Borrar del Banco
                             </button>
                         </div>
@@ -1114,49 +1440,79 @@
                 `;
             }).join('');
 
-            lucide.createIcons();
+            icons();
         }
 
-        function approveSound(id) {
-            const idx = soundsState.findIndex(s => s.id === id);
-            if (idx !== -1) {
-                soundsState[idx].approved = true;
+        async function approveSound(id) {
+            const sound = soundsState.find(s => s.id === id);
+            if (!sound) return;
+            try {
+                if (cloudEnabled() && sound.fromCloud) {
+                    await sbRequest('PATCH', 'sounds?id=eq.' + encodeURIComponent(id), { approved: true }, { Prefer: 'return=minimal' });
+                }
+                sound.approved = true;
                 saveSoundsToStorage();
-                renderPendingList();
-                renderPublishedAdminList();
-                renderSounds();
+                renderAll(false);
                 showToast('Aporte aprobado y publicado en el Banco Abierto.', 'check-circle');
+            } catch (e) {
+                console.error(e);
+                showToast('No se pudo aprobar el aporte en la nube.', 'alert-triangle');
             }
         }
 
-        function deleteSound(id) {
-            const soundToDelete = soundsState.find(s => s.id === id);
-            const title = soundToDelete ? soundToDelete.title : 'audio';
+        async function deleteSound(id) {
+            const sound = soundsState.find(s => s.id === id);
+            if (!sound) return;
+            if (!confirm(`¿Eliminar "${sound.title}"? Esta acción no se puede deshacer.`)) return;
 
-            soundsState = soundsState.filter(s => s.id !== id);
-            saveSoundsToStorage();
-            renderPendingList();
-            renderPublishedAdminList();
-            renderSounds();
-            renderPads();
-            showToast(`Se eliminó "${title}" del sistema.`, 'trash-2');
+            try {
+                if (cloudEnabled()) {
+                    if (sound.fromCloud) {
+                        await sbRequest('DELETE', 'sounds?id=eq.' + encodeURIComponent(id), undefined, { Prefer: 'return=minimal' });
+                        sbDeleteAudioFile(sound.audioUrl);
+                    } else {
+                        const hidden = getHiddenMocks();
+                        if (!hidden.includes(id)) hidden.push(id);
+                        lsSet('echobarrio_hidden_mocks', JSON.stringify(hidden));
+                    }
+                }
+                if (currentPlayingId === id) { stopCurrent(); currentPlayingId = null; }
+                soundsState = soundsState.filter(s => s.id !== id);
+                lastCloudSignature = '';
+                saveSoundsToStorage();
+                renderAll(true);
+                showToast(`Se eliminó "${sound.title}" del sistema.`, 'trash-2');
+            } catch (e) {
+                console.error(e);
+                showToast('No se pudo eliminar en la nube.', 'alert-triangle');
+            }
         }
 
-        function rejectSound(id) {
-            deleteSound(id);
-        }
+        async function clearAllPending() {
+            const pending = soundsState.filter(s => s.approved === false);
+            if (pending.length === 0) { showToast('No hay pendientes por limpiar.', 'info'); return; }
+            if (!confirm(`¿Descartar los ${pending.length} aportes pendientes?`)) return;
 
-        function clearAllPending() {
-            soundsState = soundsState.filter(s => s.approved !== false);
-            saveSoundsToStorage();
-            renderPendingList();
-            showToast('Todos los pendientes han sido limpiados.', 'trash-2');
+            try {
+                if (cloudEnabled()) {
+                    await sbRequest('DELETE', 'sounds?approved=eq.false', undefined, { Prefer: 'return=minimal' });
+                    pending.forEach(s => sbDeleteAudioFile(s.audioUrl));
+                }
+                soundsState = soundsState.filter(s => s.approved !== false);
+                lastCloudSignature = '';
+                saveSoundsToStorage();
+                renderAll(false);
+                showToast('Todos los pendientes han sido limpiados.', 'trash-2');
+            } catch (e) {
+                console.error(e);
+                showToast('No se pudieron limpiar los pendientes en la nube.', 'alert-triangle');
+            }
         }
 
         function updatePendingBadges() {
             const count = soundsState.filter(s => s.approved === false).length;
             ['pending-badge', 'mob-pending-badge'].forEach(id => {
-                const badge = document.getElementById(id);
+                const badge = $(id);
                 if (badge) {
                     if (count > 0) {
                         badge.innerText = count;
@@ -1168,13 +1524,261 @@
             });
         }
 
-        // GENERATE INTERACTIVE QR CODE (REQ #10)
+        // ==========================================
+        // MUESTRA EN VIVO: PADS
+        // ==========================================
+        const PAD_KEYS = ['1', '2', '3', '4', 'q', 'w', 'e', 'r', 'a', 's', 'd', 'f'];
+        const activePadAudios = new Set();
+
+        function renderPads(showFeedback) {
+            const container = $('sampler-pads');
+            if (!container) return;
+
+            const pool = soundsState.filter(s => s.approved !== false);
+            const real = pool.filter(s => s.audioUrl);
+            const synth = pool.filter(s => !s.audioUrl);
+            // Primero las grabaciones reales de la comunidad; el resto se completa con demos
+            padSounds = [...real, ...synth].slice(0, 12);
+
+            if (padSounds.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-zinc-500 bg-zinc-900/50 rounded-2xl border border-dashed border-zinc-800">
+                        <p class="text-sm font-medium">No hay sonidos aprobados para cargar en los pads.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = padSounds.map((s, i) => {
+                const cat = MOCK_CATEGORIES[s.type] || MOCK_CATEGORIES.ambiente;
+                const style = PAD_STYLES[s.type] || PAD_STYLES.ambiente;
+                return `
+                    <button type="button" id="pad-${i}" onpointerdown="triggerPad(${i})" class="pad-btn bg-gradient-to-br ${style} border rounded-2xl p-4 min-h-[120px] flex flex-col justify-between text-left">
+                        <div class="flex items-center justify-between w-full">
+                            <span class="text-xl">${cat.icon}</span>
+                            <span class="text-[10px] font-mono font-bold bg-zinc-950/70 text-zinc-300 px-2 py-0.5 rounded">${PAD_KEYS[i].toUpperCase()}</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold text-white leading-snug line-clamp-2">${esc(s.title)}</div>
+                            <div class="text-[10px] text-zinc-400 mt-1 truncate">${s.audioUrl ? '🎤 ' : ''}${esc(s.location)}</div>
+                        </div>
+                    </button>`;
+            }).join('');
+
+            if (showFeedback === true) showToast('Pads recargados con los últimos aportes.', 'refresh-cw');
+        }
+
+        function triggerPad(i) {
+            const s = padSounds[i];
+            if (!s) return;
+
+            const el = $('pad-' + i);
+            if (el) {
+                el.classList.add('active');
+                setTimeout(() => el.classList.remove('active'), 150);
+            }
+
+            try {
+                if (s.audioUrl) {
+                    const a = new Audio(s.audioUrl);
+                    activePadAudios.add(a);
+                    a.onended = () => activePadAudios.delete(a);
+                    a.play().catch(() => { activePadAudios.delete(a); });
+                } else {
+                    synthSample(s.freq || 300, 1.2);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function stopAllPads() {
+            activePadAudios.forEach(a => { try { a.pause(); } catch (e) { /* noop */ } });
+            activePadAudios.clear();
+            stopBeat();
+        }
+
+        // ==========================================
+        // MUESTRA EN VIVO: BEATS DE DEMOSTRACIÓN (sintetizados)
+        // ==========================================
+        let noiseBuf = null;
+        let beatTimer = null;
+        let beatPlaying = null;
+        let beatStep = 0;
+        let beatNextTime = 0;
+        let beatBus = null;
+
+        function getNoise(ctx) {
+            if (!noiseBuf) {
+                const len = ctx.sampleRate;
+                noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+                const d = noiseBuf.getChannelData(0);
+                for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+            }
+            return noiseBuf;
+        }
+
+        function tone(t, freq, dur, opts) {
+            const o = Object.assign({ type: 'sine', gain: 0.2, glideTo: null }, opts || {});
+            const ctx = getCtx();
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = o.type;
+            osc.frequency.setValueAtTime(freq, t);
+            if (o.glideTo) osc.frequency.exponentialRampToValueAtTime(o.glideTo, t + dur);
+            g.gain.setValueAtTime(o.gain, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+            osc.connect(g);
+            g.connect(o.out || beatBus);
+            osc.start(t);
+            osc.stop(t + dur + 0.02);
+        }
+
+        function noiseHit(t, dur, opts) {
+            const o = Object.assign({ filter: 'highpass', freq: 6000, q: 1, gain: 0.1 }, opts || {});
+            const ctx = getCtx();
+            const src = ctx.createBufferSource();
+            src.buffer = getNoise(ctx);
+            const f = ctx.createBiquadFilter();
+            f.type = o.filter;
+            f.frequency.value = o.freq;
+            f.Q.value = o.q;
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(o.gain, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+            src.connect(f);
+            f.connect(g);
+            g.connect(beatBus);
+            src.start(t);
+            src.stop(t + dur + 0.02);
+        }
+
+        const kick = (t, gain) => tone(t, 150, 0.3, { glideTo: 45, gain: gain || 0.9 });
+        const snare = (t) => { noiseHit(t, 0.18, { filter: 'bandpass', freq: 1800, q: 0.8, gain: 0.35 }); tone(t, 220, 0.1, { type: 'triangle', gain: 0.2 }); };
+        const hat = (t, gain) => noiseHit(t, 0.05, { filter: 'highpass', freq: 7000, gain: gain || 0.08 });
+        const tom = (t, f) => tone(t, f, 0.22, { glideTo: f * 0.6, gain: 0.5 });
+
+        const BEATS = {
+            // Cumbia electro (~100 BPM)
+            1: {
+                stepDur: 60 / 100 / 4, steps: 16,
+                play(s, t) {
+                    if (s === 0 || s === 8) kick(t);
+                    if (s % 2 === 0) hat(t, s % 4 === 0 ? 0.12 : 0.06);
+                    if (s === 6 || s === 14) tom(t, 110);
+                    if (s === 3 || s === 11) tom(t, 190);
+                    if (s === 0) tone(t, 110, 0.35, { type: 'triangle', gain: 0.35 });
+                    if (s === 4) tone(t, 110, 0.3, { type: 'triangle', gain: 0.3 });
+                    if (s === 8) tone(t, 82.4, 0.35, { type: 'triangle', gain: 0.35 });
+                    if (s === 12) tone(t, 98, 0.3, { type: 'triangle', gain: 0.3 });
+                    if (s === 10) tone(t, 520, 0.12, { type: 'square', gain: 0.05 });
+                    if (s === 11) tone(t, 620, 0.16, { type: 'square', gain: 0.05 });
+                }
+            },
+            // Ambient dub (lento, con eco)
+            2: {
+                stepDur: 0.5, steps: 16, delay: true,
+                play(s, t) {
+                    if (s === 0) [220, 261.6, 329.6].forEach(f => tone(t, f, 3.8, { gain: 0.07 }));
+                    if (s === 8) [174.6, 220, 261.6].forEach(f => tone(t, f, 3.8, { gain: 0.07 }));
+                    if (s % 4 === 0) noiseHit(t, 2.0, { filter: 'bandpass', freq: 600, q: 0.7, gain: 0.05 });
+                    if (s === 0 || s === 8) kick(t, 0.5);
+                    if (s % 2 === 1 && Math.random() < 0.3) {
+                        const f = 1800 + Math.random() * 1200;
+                        tone(t, f, 0.14, { glideTo: f * 1.4, gain: 0.05 });
+                    }
+                    if (s === 4 || s === 12) hat(t, 0.04);
+                }
+            },
+            // Urban hip-hop boom-bap (~90 BPM)
+            3: {
+                stepDur: 60 / 90 / 4, steps: 16,
+                play(s, t) {
+                    if (s === 0 || s === 7 || s === 10) kick(t);
+                    if (s === 4 || s === 12) snare(t);
+                    if (s % 2 === 0) hat(t, 0.07);
+                    if (s === 14) noiseHit(t, 0.2, { filter: 'highpass', freq: 6000, gain: 0.1 });
+                    if (s === 6 || s === 15) noiseHit(t, 0.08, { filter: 'bandpass', freq: 1200, q: 5, gain: 0.25 });
+                    if (s === 0) tone(t, 55, 0.3, { gain: 0.5 });
+                    if (s === 10) tone(t, 61.7, 0.25, { gain: 0.45 });
+                    if (s === 3) tone(t, 392, 0.15, { type: 'triangle', gain: 0.08 });
+                    if (s === 11) tone(t, 349.2, 0.15, { type: 'triangle', gain: 0.08 });
+                }
+            }
+        };
+
+        function playDemoBeat(n) {
+            const ctx = getCtx();
+            if (beatPlaying === n) { stopBeat(); return; }
+            stopBeat();
+
+            const cfg = BEATS[n];
+            if (!cfg) return;
+
+            beatBus = ctx.createGain();
+            beatBus.gain.value = 0.9;
+            beatBus.connect(ctx.destination);
+            if (cfg.delay) {
+                const dl = ctx.createDelay(1.0);
+                dl.delayTime.value = 0.375;
+                const fb = ctx.createGain();
+                fb.gain.value = 0.4;
+                beatBus.connect(dl);
+                dl.connect(fb);
+                fb.connect(dl);
+                dl.connect(ctx.destination);
+            }
+
+            beatPlaying = n;
+            beatStep = 0;
+            beatNextTime = ctx.currentTime + 0.08;
+            beatTimer = setInterval(() => {
+                while (beatNextTime < ctx.currentTime + 0.25) {
+                    cfg.play(beatStep, beatNextTime);
+                    beatNextTime += cfg.stepDur;
+                    beatStep = (beatStep + 1) % cfg.steps;
+                }
+            }, 50);
+            updateBeatButtons();
+        }
+
+        function stopBeat() {
+            clearInterval(beatTimer);
+            beatTimer = null;
+            if (beatBus) {
+                const bus = beatBus;
+                try { bus.gain.setTargetAtTime(0, getCtx().currentTime, 0.05); } catch (e) { /* noop */ }
+                setTimeout(() => { try { bus.disconnect(); } catch (e) { /* noop */ } }, 600);
+                beatBus = null;
+            }
+            beatPlaying = null;
+            updateBeatButtons();
+        }
+
+        function updateBeatButtons() {
+            [1, 2, 3].forEach(n => {
+                const btn = $('btn-beat-' + n);
+                if (!btn) return;
+                btn.innerHTML = beatPlaying === n
+                    ? `<i data-lucide="square" class="w-4 h-4"></i> Detener Beat ${n}`
+                    : `<i data-lucide="play" class="w-4 h-4"></i> Reproducir Beat ${n}`;
+            });
+            icons();
+        }
+
+        // ==========================================
+        // QR (apunta directo al formulario de aportes)
+        // ==========================================
         function generateQRCode() {
-            const qrContainer = document.getElementById("qrcode");
+            const qrContainer = $("qrcode");
             if (!qrContainer) return;
             qrContainer.innerHTML = "";
+            if (typeof QRCode === 'undefined') {
+                qrContainer.innerHTML = '<span class="text-[10px] text-zinc-700 block w-[110px] h-[110px] p-2">QR no disponible sin conexión</span>';
+                return;
+            }
+            const target = location.href.split('#')[0] + '#aportar';
             new QRCode(qrContainer, {
-                text: window.location.href,
+                text: target,
                 width: 110,
                 height: 110,
                 colorDark: "#09090b",
@@ -1183,46 +1787,70 @@
             });
         }
 
-        // SUPABASE / CONFIG MODAL LOGIC
+        // ==========================================
+        // CONFIGURACIÓN SUPABASE
+        // ==========================================
         function openConfigModal() {
-            document.getElementById('config-modal').classList.remove('hidden');
-            const savedUrl = localStorage.getItem('echobarrio_sb_url') || '';
-            const savedKey = localStorage.getItem('echobarrio_sb_key') || '';
-            document.getElementById('supabase-url').value = savedUrl;
-            document.getElementById('supabase-key').value = savedKey;
+            $('config-modal').classList.remove('hidden');
+            $('supabase-url').value = lsGet('echobarrio_sb_url') || '';
+            $('supabase-key').value = lsGet('echobarrio_sb_key') || '';
+            updateModeIndicator();
         }
 
         function closeConfigModal() {
-            document.getElementById('config-modal').classList.add('hidden');
+            $('config-modal').classList.add('hidden');
         }
 
-        function saveSupabaseConfig() {
-            const url = document.getElementById('supabase-url').value.trim();
-            const key = document.getElementById('supabase-key').value.trim();
+        async function saveSupabaseConfig() {
+            const url = $('supabase-url').value.trim().replace(/\/+$/, '');
+            const key = $('supabase-key').value.trim();
+            const btn = $('btn-save-config');
 
             if (url && key) {
-                localStorage.setItem('echobarrio_sb_url', url);
-                localStorage.setItem('echobarrio_sb_key', key);
-                document.getElementById('storage-mode-indicator').innerText = "Modo Nube (Supabase)";
-                document.getElementById('modal-status-text').innerText = "Conectado a Supabase";
-                showToast('Configuración Nube Supabase guardada.', 'database');
+                btn.disabled = true;
+                btn.innerText = 'Probando conexión...';
+                try {
+                    await sbRequest('GET', 'sounds?select=id&limit=1', undefined, undefined, { url, key });
+                } catch (e) {
+                    console.error(e);
+                    btn.disabled = false;
+                    btn.innerText = 'Guardar Configuración';
+                    showToast('No se pudo conectar. Revisa URL, llave y que hayas ejecutado supabase_setup.sql.', 'alert-triangle');
+                    return;
+                }
+                btn.disabled = false;
+                btn.innerText = 'Guardar Configuración';
+
+                lsSet('echobarrio_sb_url', url);
+                lsSet('echobarrio_sb_key', key);
+                lastCloudSignature = '';
+                loadInitialSounds();
+                updateModeIndicator();
+                closeConfigModal();
+                await refreshFromCloud(false, true);
+                showToast('Conectado a Supabase. Recarga la página en cada teléfono para activar la sincronización.', 'database');
             } else {
-                localStorage.removeItem('echobarrio_sb_url');
-                localStorage.removeItem('echobarrio_sb_key');
-                document.getElementById('storage-mode-indicator').innerText = "Modo Demo Local";
-                document.getElementById('modal-status-text').innerText = "Modo Demo (LocalStorage)";
-                showToast('Operando en Modo Local LocalStorage.', 'info');
+                lsRemove('echobarrio_sb_url');
+                lsRemove('echobarrio_sb_key');
+                loadInitialSounds();
+                updateModeIndicator();
+                renderAll(true);
+                closeConfigModal();
+                showToast('Operando en Modo Local (LocalStorage).', 'info');
             }
-            closeConfigModal();
         }
 
-        // TOAST NOTIFICATION SYSTEM
-        function showToast(msg, iconName = 'info') {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').innerText = msg;
+        // ==========================================
+        // TOAST
+        // ==========================================
+        function showToast(msg, iconName) {
+            const toast = $('toast');
+            $('toast-message').innerText = msg;
+            $('toast-icon-wrap').innerHTML = `<i data-lucide="${esc(iconName || 'info')}" class="w-5 h-5 text-amber-400"></i>`;
+            icons();
             toast.classList.remove('translate-x-full');
-
-            setTimeout(() => {
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
                 toast.classList.add('translate-x-full');
             }, 3500);
         }
