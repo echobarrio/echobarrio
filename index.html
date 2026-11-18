@@ -650,48 +650,7 @@
             coro: 'from-cyan-500/30 to-cyan-900/40 border-cyan-500/40 text-cyan-200'
         };
 
-        const INITIAL_SOUNDS = [
-            { id: 's1', title: 'Remo en el Río Magdalena', type: 'ambiente', location: 'Río Magdalena', author: 'Don Efraín', approved: true, duration: '0:12', date: '2026-11-01', freq: 220 },
-            { id: 's2', title: 'Pregón: Pescado Fresco del Muelle', type: 'pregon', location: 'Puerto Principal', author: 'Rosa María', approved: true, duration: '0:08', date: '2026-11-02', freq: 350 },
-            { id: 's3', title: 'Relato de la Abuela del Barrio', type: 'voz', location: 'Plaza Central', author: 'Carmen Lucia', approved: true, duration: '0:15', date: '2026-11-02', freq: 180 },
-            { id: 's4', title: 'Canto Tambora de las Cantadoras', type: 'coro', location: 'Casa de Cultura', author: 'Grupo Memoria', approved: true, duration: '0:14', date: '2026-11-03', freq: 440 },
-            { id: 's5', title: 'Motor de Lancha Pasajera', type: 'ambiente', location: 'El Embarcadero', author: 'Lucho Canoas', approved: true, duration: '0:10', date: '2026-11-03', freq: 120 },
-            { id: 's6', title: 'Pregón: Aguacate Maneiro', type: 'pregon', location: 'Mercado Satélite', author: 'Jorge Vendedor', approved: true, duration: '0:06', date: '2026-11-04', freq: 500 },
-            { id: 's7', title: 'Sonido de la Brisa en los Manglares', type: 'ambiente', location: 'Sector La Laguna', author: 'Ana Patricia', approved: true, duration: '0:15', date: '2026-11-04', freq: 280 },
-            { id: 's8', title: 'Risas de Niños en la Cancha', type: 'voz', location: 'Barrio El Carmen', author: 'Profe Manuel', approved: true, duration: '0:09', date: '2026-11-05', freq: 600 },
-            { id: 's9', title: 'Campana de la Capilla Vieja', type: 'ambiente', location: 'Barrio Arriba', author: 'Padre Gabriel', approved: true, duration: '0:05', date: '2026-11-05', freq: 520 },
-            { id: 's10', title: 'Pregón: Arepa e Huevo Caliente', type: 'pregon', location: 'Esquina de la 5ta', author: 'Doña Petrona', approved: true, duration: '0:07', date: '2026-11-05', freq: 390 },
-            { id: 's11', title: 'Pájaros al Amanecer en el Malecón', type: 'ambiente', location: 'Malecón Turístico', author: 'Felipe Eco', approved: true, duration: '0:15', date: '2026-11-06', freq: 800 },
-            { id: 's12', title: 'Tambor Alegre Solo de Apertura', type: 'coro', location: 'Plaza de Toros Old', author: 'Mateo Percusión', approved: true, duration: '0:11', date: '2026-11-06', freq: 160 },
-            { id: 's13', title: 'Pregón: Raspado de Kola y Limón', type: 'pregon', location: 'Parque Infantil', author: 'Chucho Raspados', approved: true, duration: '0:08', date: '2026-11-06', freq: 480 },
-            { id: 's14', title: 'Voz: Recuerdo del Primer Festival', type: 'voz', location: 'Centro Histórico', author: 'Don Tiberio', approved: true, duration: '0:15', date: '2026-11-07', freq: 200 },
-            { id: 's15', title: 'Golpe de Malla de Pescadores', type: 'ambiente', location: 'Orilla del Río', author: 'Asociación Pescadores', approved: true, duration: '0:10', date: '2026-11-07', freq: 250 },
-            { id: 's16', title: 'Grito de Alegría en Partido de Gol', type: 'voz', location: 'Cancha Polideportiva', author: 'Santi C.', approved: true, duration: '0:04', date: '2026-11-07', freq: 650 },
-            { id: 's17', title: 'Pregón: Plátano Pelao y Queso', type: 'pregon', location: 'Calle Los Caobos', author: 'Marta Elvira', approved: true, duration: '0:07', date: '2026-11-07', freq: 420 },
-            { id: 's18', title: 'Canto Infantil de Ronda Tradicional', type: 'coro', location: 'Escuela Comunitaria', author: 'Niños Grado 4', approved: true, duration: '0:13', date: '2026-11-08', freq: 700 },
-            { id: 's19', title: 'Chorro de Agua en la Fuente Pública', type: 'ambiente', location: 'Plaza Principal', author: 'Vecinos Unidos', approved: true, duration: '0:12', date: '2026-11-08', freq: 300 },
-            { id: 's20', title: 'Lluvia Repentina sobre Techo de Zinc', type: 'ambiente', location: 'Barrio La Unión', author: 'Néstor B.', approved: true, duration: '0:15', date: '2026-11-08', freq: 150 },
-            { id: 's21', title: 'Pito de la Chupa de la Leche', type: 'pregon', location: 'Sector El Bosque', author: 'Carlos V.', approved: true, duration: '0:05', date: '2026-11-08', freq: 600 },
-            { id: 's22', title: 'Copla Improvisada de Botero', type: 'voz', location: 'Paso de la Barca', author: 'Tite Botero', approved: true, duration: '0:14', date: '2026-11-08', freq: 210 },
-            { id: 's23', title: 'Silbato del Afilador de Cuchillos', type: 'pregon', location: 'Barrio Santander', author: 'Don Jaime', approved: true, duration: '0:06', date: '2026-11-08', freq: 900 },
-            { id: 's24', title: 'Afinación de Acordeón en Patio', type: 'coro', location: 'Calle 10', author: 'Memo Acordeón', approved: true, duration: '0:12', date: '2026-11-08', freq: 440 },
-            { id: 's25', title: 'Grillos al Anochecer en el Muelle', type: 'ambiente', location: 'Muelle Flotante', author: 'Camila R.', approved: true, duration: '0:15', date: '2026-11-08', freq: 950 },
-            { id: 's26', title: 'Pregón: Pan Caliente de la Mañana', type: 'pregon', location: 'Panadería Central', author: 'Hernán P.', approved: true, duration: '0:07', date: '2026-11-08', freq: 370 },
-            { id: 's27', title: 'Relato: El Mito de la Caimanera', type: 'voz', location: 'Biblioteca Popular', author: 'Profe Vilma', approved: true, duration: '0:15', date: '2026-11-08', freq: 190 },
-            { id: 's28', title: 'Canto de Garzas en la Orilla', type: 'ambiente', location: 'Isla de los Patos', author: 'Lucho Avistador', approved: true, duration: '0:09', date: '2026-11-08', freq: 750 },
-            { id: 's29', title: 'Golpes de Dominó en la Esquina', type: 'ambiente', location: 'Tienda La Envidia', author: 'Compadres Club', approved: true, duration: '0:08', date: '2026-11-08', freq: 320 },
-            { id: 's30', title: 'Pregón: Cocadas y Dulce de Papaya', type: 'pregon', location: 'Plaza de Mercado', author: 'Clarisa Dulces', approved: true, duration: '0:08', date: '2026-11-08', freq: 410 },
-            { id: 's31', title: 'Aplausos de la Asamblea de Barrio', type: 'voz', location: 'Salón Comunal', author: 'Junta Vecinal', approved: true, duration: '0:10', date: '2026-11-08', freq: 500 },
-            { id: 's32', title: 'Voces de Pescadores Limpiando Redes', type: 'voz', location: 'Playa de los Botes', author: 'Charly Pescador', approved: true, duration: '0:13', date: '2026-11-08', freq: 230 },
-            { id: 's33', title: 'Pregón: Yuca Dulce de la Sabana', type: 'pregon', location: 'Avenida del Río', author: 'Orlando Yuca', approved: true, duration: '0:06', date: '2026-11-08', freq: 330 },
-            { id: 's34', title: 'Coro de Voces Femeninas en Lavadero', type: 'coro', location: 'Lavaderos Públicos', author: 'Mujeres del Río', approved: true, duration: '0:15', date: '2026-11-08', freq: 550 },
-            { id: 's35', title: 'Crujido de Canoa de Madera', type: 'ambiente', location: 'Orilla Sur', author: 'Mariano C.', approved: true, duration: '0:07', date: '2026-11-08', freq: 140 },
-            { id: 's36', title: 'Sonido de la Hielo al Partirse', type: 'ambiente', location: 'Bodega de Hielo', author: 'Rafa Hielo', approved: true, duration: '0:05', date: '2026-11-08', freq: 620 },
-            { id: 's37', title: 'Pregón: Peto Caliente con Canela', type: 'pregon', location: 'Barrio El Triunfo', author: 'Don Tobías', approved: true, duration: '0:08', date: '2026-11-08', freq: 310 },
-            { id: 's38', title: 'Gaita Macho Ensayo Corto', type: 'coro', location: 'Taller de Arte', author: 'Kike Gaita', approved: true, duration: '0:12', date: '2026-11-08', freq: 490 },
-            { id: 's39', title: 'Silbido Característico del Vecindario', type: 'voz', location: 'Calle Principal', author: 'Andrés S.', approved: true, duration: '0:04', date: '2026-11-08', freq: 880 },
-            { id: 's40', title: 'Oleaje Suave al Atardecer', type: 'ambiente', location: 'Mirador del Río', author: 'Equipo EchoBarrio', approved: true, duration: '0:15', date: '2026-11-08', freq: 110 }
-        ];
+        const INITIAL_SOUNDS = [];
 
         // ==========================================
         // AUDIO (AudioContext perezoso)
